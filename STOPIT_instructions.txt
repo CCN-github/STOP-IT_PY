@@ -1,0 +1,9 @@
+Your main task is to respond to green arrows that appear on the screen. Press the LEFT ARROW KEY with the right index finger when you see a LEFT ARROW and press the RIGHT ARROW KEY with the right middle finger when you see a RIGHT ARROW.
+
+Thus, left arrow = left key and right arrow = right key.
+
+However, on some trials (stop-signal trials) the arrow will turn red after a variable delay. Such a red arrow signals that you have to withhold your response. On approximately half of the stop-signal trials, the arrow will turn red soon and you will notice that it will be easy to stop your response. On the other half of the trials, the arrow will turn red late and it will become very difficult or even impossible to stop your response.
+
+It is really important that you do not wait for the red arrow (the stop signal) to occur and that you respond as quickly and as accurately as possible. After all, if you start waiting for the red arrow, than the program will delay its presentation. This will result in long reaction times. 
+
+We will start with a short practice block in which you will receive immediate feedback. You will no longer receive immediate feedback in the experimental phase. However, at the end of each experimental block, there will be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.
