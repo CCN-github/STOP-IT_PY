@@ -1,3 +1,16 @@
+"""
+      _                    _ _   
+  ___| |_ ___  _ __       (_) |_ 
+ / __| __/ _ \| '_ \ _____| | __|
+ \__ \ || (_) | |_) |_____| | |_ 
+ |___/\__\___/| .__/      |_|\__|
+              |_|                
+  AUTHOR: Frederick Verbruggen 
+  Description: This is a basic version of the stop-signal task. 
+"""
+#####################################################################
+### Start with importing some modules 
+#####################################################################
 from psychopy import gui, data, visual, event, core
 import os
 import numpy as np
@@ -54,14 +67,13 @@ while already_exists:
         print("*** EXPERIMENT ABORTED BY USER ***")
         core.quit()
 
-# create an experiment handler
-# this will ensure that the data file is written appropriately
+#create an experiment handler (will be used to write the data to a file)
 thisExp = data.ExperimentHandler(dataFileName=file_name, extraInfo = info)
 
 # initialise screen & timer
 win = visual.Window(fullscr=True, units = 'pix')
 win.mouseVisible = False
-experiment_timer = core.Clock()
+exp_timer = core.Clock()
 
 #####################################################################
 ### Functions required to run the experiment
@@ -85,7 +97,7 @@ def getReady():
     win.flip()
     core.wait(2)
 
-# function to present stimuli within a trial 
+# function to present stimuli within a trial and register responses
 def stimPresent(SSD): 
     # clear event buffer, screen and start ITI
     event.clearEvents(eventType="keyboard")
@@ -101,14 +113,14 @@ def stimPresent(SSD):
     win.flip()
     
     # reset timer and variables
-    experiment_timer.reset()
+    exp_timer.reset()
     signalPresent = False
     signalTime = 0
     
     # start timer loop
     trial_continue = True
     while trial_continue:
-        lapse = experiment_timer.getTime() # elapsed time
+        lapse = exp_timer.getTime() # elapsed time
         response=event.getKeys(keyList = keys) # check responses; only allow keys listed above 
         
         # abort experiment when escape key is pressed
@@ -125,7 +137,7 @@ def stimPresent(SSD):
             arrow_stop.draw()
             win.flip()
             signalPresent = True
-            signalTime = experiment_timer.getTime()
+            signalTime = exp_timer.getTime()
     
     # return some stuff 
     return (response, lapse, signalTime) 
