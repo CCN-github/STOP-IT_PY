@@ -18,15 +18,8 @@ import numpy as np
 #####################################################################
 ### Define variables etc. 
 #####################################################################
-# Specify the design (2 by 4 in this instance) and number of experimental blocks
-go = [0,1] # left (0) vs. right (1) arrows
-signal = [0,0,0,1] # 1/4 of the trials are signal (1) trials
-design = data.createFactorialTrialList({"goStim": go, "signal": signal})
-NexpBL = 3 # number of experimental blocks
-
-# arrow coordinates and colors
-XY = [[(-40,0),(0,20),(0,-20)], [(40,0),(0,20),(0,-20)]]
-CLRS = ['green', 'red'] # colors of the go and stop arrows, respectively
+# number of experimental blocks
+NexpBL = 3 
 
 # time variables
 ITI = 0.500 # fixed intertrial interval
@@ -36,8 +29,19 @@ SSDstep = 0.050 # step size of the tracking procedure; this is also the lowest p
 iFBT = 0.500 # immediate feedback interval
 bFBT = 15. # break interval between blocks 
 
+# parameters of the visual stimuli
+size = 50 # size of the stimuli (in pixels)
+XY = [[-size/2,0],[0,size/2],[0,size/4],[size/2,size/4],[size/2,-size/4],[0,-size/4],[0,-size/2]] # basic coordinates of a leftwards-pointing arrow
+CLRS = ['green', 'red'] # colors of the go and stop arrows, respectively
+
 # define response keys (in this case: the arrow keys and esc key)
 keys = ('left', 'right', 'escape')
+
+### DO NOT CHANGE THE DESIGN (UNLESS YOU REALLY KNOW WHAT YOU ARE DOING)
+# Specify the design (2 by 4 in this instance) 
+go = [0,1] # left (0) vs. right (1) arrows
+signal = [0,0,0,1] # 1/4 of the trials are signal (1) trials
+design = data.createFactorialTrialList({"goStim": go, "signal": signal})
 
 #####################################################################
 ### Initialise experiment
@@ -104,9 +108,10 @@ def stimPresent(SSD):
     win.flip()
     core.wait(ITI)
     
-    # prepare the stimuli 
-    arrow_go = visual.ShapeStim(win, vertices=XY[trial["goStim"]], fillColor=CLRS[0], lineWidth=0, pos=(0,0))
-    arrow_stop = visual.ShapeStim(win, vertices=XY[trial["goStim"]], fillColor=CLRS[1], lineWidth=0, pos=(0,0))
+    # prepare the stimuli
+    orient = [0,180] # left: orient[0] = 0; right: orient[1] = 180
+    arrow_go = visual.ShapeStim(win, vertices=XY, fillColor=CLRS[0], lineWidth=0, pos=(0,0), ori = orient[trial["goStim"]])
+    arrow_stop = visual.ShapeStim(win, vertices=XY, fillColor=CLRS[1], lineWidth=0, pos=(0,0), ori = orient[trial["goStim"]])
 
     # present the go stimulus
     arrow_go.draw()
@@ -136,14 +141,14 @@ def stimPresent(SSD):
         if lapse > (SSD - .010) and trial["signal"] == 1 and signalPresent == False:
             arrow_stop.draw()
             win.flip()
-            signalPresent = True
             signalTime = exp_timer.getTime()
+            signalPresent = True
     
     # return some stuff 
     return (response, lapse, signalTime) 
 
 # function to process the output of a trial and perform staircase tracking
-# Note: latencies are converted to ms
+# note: latencies are converted to ms at this stage
 def output(b, SSD, response, lapse, signalTime):
     # add block number to the data file
     trials.addData("block", b) 
@@ -157,7 +162,7 @@ def output(b, SSD, response, lapse, signalTime):
         trials.addData("RT", 0)
 
     # determine if trial is correct or not
-    # for signal trials, we immediately update the SSD value
+    # for signal trials, we immediately update the SSD value as well
     if trial["signal"] == 0:
         trials.addData("ssdReq", 0)
         trials.addData("ssdTrue", 0)
@@ -180,10 +185,8 @@ def output(b, SSD, response, lapse, signalTime):
             trials.addData("acc", 1)
             fb_text = "correct stop"
         
-        if SSD < SSDstep: SSD = SSDstep # SSD can never be lower than the step size... 
-        #...(to ensure that the stop signal always follows the go stimulus) 
-        
-        if SSD >= MAXRT: SSD = MAXRT - SSDstep # SSD can never be equal or higher than MAXRT... 
+        if SSD < SSDstep: SSD = SSDstep # SSD can never be lower than the step size (i.e. the stop signal will always follow the go stimulus)      
+        if SSD >= MAXRT: SSD = MAXRT - SSDstep # SSD can never be equal or higher than MAXRT (i.e. the stop signal will always appear before the go stimulus is removed)
         
     # return updated SSD value and feedback text
     return (SSD, fb_text)
@@ -236,7 +239,7 @@ def blockFeedback():
         feedbackText.draw()
         win.flip()
     
-    # they can now press a key to restart
+    # they can now press the space bar to restart
     feedbackString2 = visual.TextStim(win, text="press the space bar to continue")
     feedbackString2.draw()
     win.flip()
@@ -259,7 +262,7 @@ def goodbye():
 presentInstructions()
 
 # present the blocks. 
-# the first block is a practice block with immediate feedback. 
+# the first block is a short practice block with immediate feedback. 
 for b in range(1+NexpBL):
     # prepare the block
     if b == 0: nREP = 4 # how often should the main design (see above) be repeated in practice blocks? 
@@ -276,8 +279,8 @@ for b in range(1+NexpBL):
         if b == 0: immediateFeedback(fb_text) # present immediate feeback in the practice block
         thisExp.nextEntry() # inform ExperimentHandler that the current trial has ended
     
-    # present block feedback
-    blockFeedback() 
+    # present block feedback between blocks (but not at the end of the experiment
+    if b < NexpBL: blockFeedback() 
 
 # wrap up  
 goodbye() # present goodby message
